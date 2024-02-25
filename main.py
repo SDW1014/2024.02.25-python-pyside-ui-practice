@@ -1,7 +1,7 @@
 ## 사용불가 (2024-02-25)
-# import myPyside6
+# import module.myPyside6
 ## 사용불가 (2024-02-25)
-# import myTkinter as MT
+# import module.myTkinter as MT
 
 def main():
     # myPyside6.start() #myPyside6의 시작하는 함수 사용 불가
