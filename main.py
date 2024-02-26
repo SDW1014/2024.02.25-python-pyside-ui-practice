@@ -4,6 +4,8 @@
 # import module.myTkinter as MT
 import module.myPyQt5 as MMPQ5
 
+import module.myPyQ5_html_1 as MPPQ5H
+
 def main():
     ## myPyside6의 main 
     # S : 시작
@@ -18,10 +20,15 @@ def main():
     
     ## myPyQt5의 main 
     # S : 시작
-    MMPQ5.main()
+    # MMPQ5.main()
     # E : 끝
     
-    print("hello")
+    ## myPyQ5_html_1의 main 
+    # S : 시작
+    MPPQ5H.main()
+    # E : 끝
+    
+    # print("hello")
     
     
 if __name__ == ("__main__"):
