@@ -9,3 +9,4 @@
 X. 터미널에 -> pip install PySide6 를 사용하여 pySide6을 설치한다. (실패)
 X. 터미널에 -> pip install Tkinter 를 사용하여 Tkinter을 설치한다. (실패)
 1. 터미널에 -> pip install PyQt5를 사용하여 PyQt5를 설치한다. 
+2. 터미널에 -> pip install PyQtWebEngine를 사용하여 PyQtWebEngine을 설치한다.
