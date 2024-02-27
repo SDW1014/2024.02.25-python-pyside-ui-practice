@@ -2,8 +2,9 @@
 # import module.myPyside6
 ## 사용불가 (2024-02-25)
 # import module.myTkinter as MT
-import module.myPyQt5 as MMPQ5
-
+## 사용가능 (2024-02-26)
+# import module.myPyQt5 as MMPQ5
+## 사용가능 (2024-02-26)
 import module.myPyQ5_html_1 as MPPQ5H
 
 def main():
