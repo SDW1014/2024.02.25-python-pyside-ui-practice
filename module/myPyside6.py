@@ -1,92 +1,85 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QMenuBar
-from PySide6.QtGui import QAction
-from PySide6.QtCore import QPropertyAnimation, QRect
+from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QPushButton, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel
+from PySide6.QtGui import QPixmap
+
+class PageWidget(QWidget):
+    def __init__(self, data):
+        super().__init__()
+        self.data = data
+        self.initUI()
+
+    def initUI(self):
+        layout = QGridLayout(self)
+        for i, item in enumerate(self.data):
+            button = QPushButton()
+            pixmap = QPixmap(f"images/{item}.jpg")  # 예시 이미지 경로
+            button.setIcon(pixmap)
+            button.setIconSize(pixmap.size())
+            layout.addWidget(button, i // 5, i % 5)
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.button_count = 0  # 동적으로 추가된 버튼의 개수를 추적
+        self.data = list(range(1, 101))  # 예시 데이터: 1부터 100까지의 숫자
+        self.page_size = 20  # 페이지당 아이템 개수
+        self.current_page = 0  # 현재 페이지
         self.initializeUI()
 
     def initializeUI(self):
-        """Initializes the window's UI."""
-        self.setWindowTitle("PySide6 Dynamic Widgets")
-        self.setGeometry(300, 300, 1080, 600)
-        self.createMenus()
-        self.addDynamicButton()
-        self.configureStyles()
+        self.setWindowTitle("Dynamic Paging Example")
+        self.setGeometry(300, 300, 600, 400)
+        self.createPageWidgets()
+        self.createNavigationButtons()
+        self.showPage(self.current_page)
 
-    def configureStyles(self):
-            """Sets the window's style."""
-            self.setStyleSheet("""
-                QMainWindow {
-                    background-color: #2b2b2b;
-                }
-                QMenuBar {
-                    background-color: #333;
-                    color: #fff;
-                }
-                QMenuBar::item:selected {
-                    background-color: #555;
-                }
-                QMenu {
-                    background-color: #333;
-                    color: #fff;
-                }
-                QMenu::item:selected {
-                    background-color: #555;
-                }
-                QPushButton {
-                    background-color: #5a5a5a;
-                    color: #ffffff;
-                    border: 2px solid #5a5a5a;
-                    border-radius: 5px;
-                }
-                QPushButton:hover {
-                    background-color: #787878;
-                }
-                QPushButton:pressed {
-                    background-color: #505050;
-                }
-            """)
+    def createPageWidgets(self):
+        self.mainWidget = QWidget()
+        self.setCentralWidget(self.mainWidget)
 
-    def createMenus(self):
-        """Creates the menu bar and dynamically adds menus."""
-        self.dynamic_menu = self.menuBar().addMenu("동적 메뉴")
-        self.addMenuAction(self.dynamic_menu, "새 버튼 추가", self.addDynamicPushButtonWithAnimation)
+        self.stackedLayout = QStackedWidget()
+        self.mainLayout = QVBoxLayout(self.mainWidget)
+        self.mainLayout.addWidget(self.stackedLayout)
 
-    def addMenuAction(self, menu, action_name, action_function):
-        """Dynamically adds an action to a menu."""
-        action = QAction(action_name, self)
-        action.triggered.connect(action_function)
-        menu.addAction(action)
+        for i in range(len(self.data) // self.page_size + 1):
+            page_data = self.data[i*self.page_size : (i+1)*self.page_size]
+            page_widget = PageWidget(page_data)
+            self.stackedLayout.addWidget(page_widget)
 
-    def addDynamicButton(self):
-        """Adds a button that creates more buttons dynamically."""
-        self.addDynamicPushButtonWithAnimation()
+        self.pageLabel = QLabel()
+        self.updatePageLabel()
+        self.mainLayout.addWidget(self.pageLabel)
 
-    def addDynamicPushButtonWithAnimation(self):
-        """Adds a new push button to the window dynamically with animation."""
-        self.button_count += 1
-        new_button = QPushButton(f"버튼 {self.button_count}", self)
-        y_position = 50 + (40 * self.button_count)
-        new_button.setGeometry(50, y_position, 100, 30)
-        new_button.clicked.connect(lambda: self.buttonClicked(self.button_count))
-        new_button.show()  # 새로운 버튼을 보이게 합니다.
-        self.animateButton(new_button)
+    def createNavigationButtons(self):
+        self.nextButton = QPushButton("Next")
+        self.nextButton.clicked.connect(self.nextPage)
 
-    def animateButton(self, button):
-        """Animates the button."""
-        animation = QPropertyAnimation(button, b"geometry")
-        animation.setDuration(1000)
-        animation.setStartValue(button.geometry())
-        animation.setEndValue(QRect(50, button.geometry().y(), 200, 50))  # 버튼 크기와 위치 조정
-        animation.start()
+        self.prevButton = QPushButton("Previous")
+        self.prevButton.clicked.connect(self.prevPage)
 
-    def buttonClicked(self, button_number):
-        """Action to perform when a dynamic button is clicked."""
-        print(f"버튼 {button_number} 클릭됨")
+        self.navLayout = QHBoxLayout()
+        self.navLayout.addWidget(self.prevButton)
+        self.navLayout.addStretch(1)
+        self.navLayout.addWidget(self.nextButton)
+        self.mainLayout.addLayout(self.navLayout)
+
+    def nextPage(self):
+        if self.current_page < self.stackedLayout.count() - 1:
+            self.current_page += 1
+            self.showPage(self.current_page)
+
+    def prevPage(self):
+        if self.current_page > 0:
+            self.current_page -= 1
+            self.showPage(self.current_page)
+
+    def showPage(self, page_index):
+        self.stackedLayout.setCurrentIndex(page_index)
+        self.updatePageLabel()
+
+    def updatePageLabel(self):
+        total_pages = self.stackedLayout.count()
+        current_page = self.current_page + 1
+        self.pageLabel.setText(f"Page {current_page}/{total_pages}")
 
 def start():
     app = QApplication(sys.argv)
