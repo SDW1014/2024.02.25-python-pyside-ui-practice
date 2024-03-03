@@ -1,63 +1,40 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton
 
-class MyApp(QWidget):
+class ConsoleApp(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #f0f0f0;
-            }
-            QPushButton {
-                background-color: #0088ff;
-                color: white;
-                border-radius: 10px;
-                padding: 10px;
-                font-size: 15px;
-            }
-            QPushButton:hover {
-                background-color: #0055cc;
-            }
-            QListWidget {
-                border: none;
-                padding: 10px;
-                font-size: 14px;
-            }
-            QLabel {
-                color: #333;
-                font-size: 14px;
-                padding: 10px;
-            }
-        """)
-        
         layout = QVBoxLayout()
+        self.outputArea = QTextEdit()  # 출력 영역
+        self.outputArea.setReadOnly(True)  # 읽기 전용으로 설정
         
-        self.listWidget = QListWidget()
-        self.addButton = QPushButton('항목 추가')
-        self.infoLabel = QLabel('선택된 항목 정보를 여기에 표시합니다.')
+        self.inputLine = QLineEdit()  # 입력 필드
+        self.inputLine.returnPressed.connect(self.executeCommand)
         
-        self.addButton.clicked.connect(self.addItem)
-        self.listWidget.itemClicked.connect(self.showItemInfo)
-        
-        layout.addWidget(self.listWidget)
-        layout.addWidget(self.addButton)
-        layout.addWidget(self.infoLabel)
-        
+        self.executeBtn = QPushButton('Execute')  # 실행 버튼
+        self.executeBtn.clicked.connect(self.executeCommand)
+
+        layout.addWidget(self.outputArea)
+        layout.addWidget(self.inputLine)
+        layout.addWidget(self.executeBtn)
+
         self.setLayout(layout)
-        self.setWindowTitle('깔끔한 동적 UI 예제')
-        self.setGeometry(100, 100, 300, 400)
-    
-    def addItem(self):
-        self.listWidget.addItem(f'항목 {self.listWidget.count() + 1}')
-    
-    def showItemInfo(self, item):
-        self.infoLabel.setText(f'{item.text()}이(가) 선택되었습니다.')
+        self.setWindowTitle('Console Example')
+        self.setGeometry(100, 100, 600, 400)
+
+    def executeCommand(self):
+        command = self.inputLine.text()
+        self.outputArea.append(f"> {command}")  # 입력된 명령을 출력 영역에 표시
+        # TODO: 여기에서 실제 명령 처리 로직을 구현할 수 있습니다.
+        self.inputLine.clear()  # 입력 필드 초기화
 
 def main():
     app = QApplication(sys.argv)
-    ex = MyApp()
+    ex = ConsoleApp()
     ex.show()
     sys.exit(app.exec_())
+    
+main()
